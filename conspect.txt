@@ -1,0 +1,43 @@
+------- 2 Занятие
+
+fork + exec
+
+1. Contexts of processes + how fork works
+
+user | system
+process context - just it's memory and registers
+system context - open files, UID, GID, PID, PPID, pointer to memory space (CR3)
+
+COW (copy on write) mechanism
+User contexts in fork
+
+Прерывания и исключения (прочитать)
+
+pid_t pid = fork();
+
+2. Parent/child relationship
+
+wait
+zombie process
+daemon
+
+3. Input/output
+
+read/write
+pipe
+read/write circle
+
+-------- 3 Занятие
+
+exec|l v| p | e
+exec and process context
+path variable is passed through main argument
+dup/dup2
+lexical analyzer
+
+-------- 4 Занятие
+
+pipe == кольцевой буффер
+open function
+umask - отнимание привелегии
+lseak 
