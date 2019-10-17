@@ -2,7 +2,9 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+
 #include <unistd.h>
+#include <stdio.h>
 
 
 // Regular expressions parser
@@ -22,6 +24,7 @@ struct PipePart {
 public:
 
   PipePart();
+  PipePart(const std::string& line);
 
   int input;
   int output;
@@ -33,9 +36,6 @@ public:
 };
 
 class LexParser {
-
-private:
-  PipePart get_part(const std::string& line);
 
 public:
   LexParser();

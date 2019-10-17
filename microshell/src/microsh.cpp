@@ -31,19 +31,21 @@ int Microsh::execute_pipe(std::vector<PipePart>& parts, int last_output, size_t 
   // Check if pipe has ended and then connect it's parts
 
   if (idx != parts.size()) {
+
     int output_pipe[2];
     pipe(output_pipe);
 
     // Child process
     if ( fork() == 0 ) {
 
-      if (last_output) {
-        dup2(last_output, 0);
-        close(last_output);
+      if (last_output || parts[idx].input != 0) {
+        dup2( (parts[idx].input == 0) ? last_output : parts[idx].input, 0);
+        if (last_output)
+          close(last_output);
       }
 
-      if (idx != parts.size()-1)
-        dup2(output_pipe[1], 1);
+      if ((idx != parts.size()-1) || (parts[idx].output != 1))
+        dup2((parts[idx].output == 1) ? output_pipe[1] : parts[idx].output, 1);
 
       close(output_pipe[0]);
       close(output_pipe[1]);
