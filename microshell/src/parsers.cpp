@@ -50,23 +50,6 @@ PipePart::PipePart(const std::string& line) {
 
 }
 
-int PipePart::exec() {
-
-  // Formatting arguments
-
-  std::vector<char *> args_pointers;
-
-  for (auto const &q: arguments) {
-    args_pointers.push_back((char *)(q.c_str()));
-  }
-  args_pointers.push_back(NULL);
-
-  // Execute
-
-  return execvp(command.c_str(), &args_pointers[0]);
-
-};
-
 LexParser::LexParser() {};
 
 //TODO: If file doesn't exist we should not crash

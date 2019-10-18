@@ -17,7 +17,8 @@ private:
   LexParser lex_parser;
 
   std::vector<PipePart> parse_command(const std::string& line);
-  int execute_pipe(std::vector<PipePart>& parts, int last_output, size_t idx);
+  int exec_pipe(const std::vector<PipePart>& parts, int last_output, size_t idx);
+  int exec(const PipePart& part);
 
 public:
 

@@ -26,7 +26,22 @@ std::vector<PipePart> Microsh::parse_command(const std::string &line) {
 // Execution //
 ///////////////
 
-int Microsh::execute_pipe(std::vector<PipePart>& parts, int last_output, size_t idx) {
+int Microsh::exec(const PipePart& part) {
+  // Formatting arguments
+
+  std::vector<char *> args_pointers;
+
+  for (auto const &q: part.arguments) {
+    args_pointers.push_back((char *)(q.c_str()));
+  }
+  args_pointers.push_back(NULL);
+
+  // Execute
+
+  return execvp(part.command.c_str(), &args_pointers[0]);
+}
+
+int Microsh::exec_pipe(const std::vector<PipePart>& parts, int last_output, size_t idx) {
 
   // Check if pipe has ended and then connect it's parts
 
@@ -50,7 +65,7 @@ int Microsh::execute_pipe(std::vector<PipePart>& parts, int last_output, size_t 
       close(output_pipe[0]);
       close(output_pipe[1]);
 
-      parts[idx].exec();
+      exec(parts[idx]);
 
     // Parrent
     } else {
@@ -59,7 +74,7 @@ int Microsh::execute_pipe(std::vector<PipePart>& parts, int last_output, size_t 
         close(last_output);
       close(output_pipe[1]);
 
-      return execute_pipe(parts, output_pipe[0], idx+1);
+      return exec_pipe(parts, output_pipe[0], idx+1);
     }
   }
 
@@ -74,7 +89,7 @@ int Microsh::run(const std::string& line) {
 
   // Now pipe itself
 
-  int code = execute_pipe(parts, 0, 0);
+  int code = exec_pipe(parts, 0, 0);
 
   // Now wait for it all to end
 

@@ -31,8 +31,6 @@ public:
   std::string command;
   std::vector<std::string> arguments;
 
-  int exec();
-
 };
 
 class LexParser {
