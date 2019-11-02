@@ -11,7 +11,6 @@ std::string RegExpParser::parse(const std::string &line) {
 
 PipePart::PipePart() {};
 
-//TODO: Incorporate < and >
 PipePart::PipePart(const std::string& line) {
 
   // Parse arguments
