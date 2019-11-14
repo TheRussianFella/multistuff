@@ -80,7 +80,9 @@ int Microsh::set(const PipePart& part) {
 
 int Microsh::echo(const PipePart &part) {
 
-  std::cout << shell_variables.at("nigga") << "\n";
+  for (size_t i = 1; i < part.arguments.size(); ++i)
+    std::cout << part.arguments[i] << " ";
+  std::cout << "\n";
 
   return 0;
 }
@@ -88,9 +90,8 @@ int Microsh::echo(const PipePart &part) {
 // Execution //
 ///////////////
 
-//TODO: Variables + (set, echo)
-//TODO: Insert variables into commands
 //TODO: Make display of sudo priveledges
+//TODO: Regular expressions
 
 int Microsh::exec(const PipePart& part) {
 

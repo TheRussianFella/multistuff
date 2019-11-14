@@ -39,6 +39,8 @@
 %type  <PipePart> command;
 %type  <std::vector<PipePart>> list;
 %token <std::string> COMMAND_PART;
+%token <std::string> VARIABLE;
+%token <std::string> RAW_COMMAND_PART;
 
 %%
 %start result;
@@ -55,9 +57,12 @@ list:
 
 command:
   %empty                   {}
-| command ">" COMMAND_PART { $$ = $1; $$.output_file = std::string($3); }
-| command "<" COMMAND_PART { $$ = $1; $$.input_file  = std::string($3); }
-| command COMMAND_PART     { $$ = $1; $$.arguments.push_back(std::string($2)); }
+| command ">" COMMAND_PART { $$ = $1; $$.output_file = $3; }
+| command "<" COMMAND_PART { $$ = $1; $$.input_file  = $3; }
+| command COMMAND_PART     { $$ = $1; $$.arguments.push_back($2); }
+| command VARIABLE         { $$ = $1; $$.arguments.push_back( drv.insert_variable($2) ); }
+| command RAW_COMMAND_PART { $$ = $1; $$.arguments.push_back
+                                (drv.insert_multi_variables($2.substr(1, $2.size()-2))); }
 ;
 %%
 

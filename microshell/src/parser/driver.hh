@@ -20,6 +20,10 @@ YY_DECL;
 
 class Driver
 {
+
+private:
+  DefaultDict* variables;
+
 public:
 
   Driver (DefaultDict* variables);
@@ -31,7 +35,8 @@ public:
   std::string target;
 
   // variables
-  DefaultDict* variables;
+  std::string insert_variable(const std::string& line);
+  std::string insert_multi_variables(const std::string& line);
 
   // Handling the scanner.
   void scan_begin ();

@@ -30,7 +30,9 @@
   # define YY_USER_ACTION  loc.columns (yyleng);
 %}
 
-com_part \"([^\\\"]|\\.)*\"|[=]|[^|<>\"*?= \t\n]+
+com_part [=]|[^|<>\"*?=$ \t\n]+
+com_raw_part  \"([^\\\"]|\\.)*\"
+variable \$[a-zA-Z]+
 
 %%
 %{
@@ -48,6 +50,9 @@ com_part \"([^\\\"]|\\.)*\"|[=]|[^|<>\"*?= \t\n]+
 "<"            return yy::parser::make_WRITEFROM(loc);
 
 {com_part}     return yy::parser::make_COMMAND_PART (yytext, loc);
+{variable}     return yy::parser::make_VARIABLE     (yytext, loc);
+{com_raw_part} return yy::parser::make_RAW_COMMAND_PART (yytext, loc);
+
 .              {
                 throw yy::parser::syntax_error
                   (loc, "invalid character: " + std::string(yytext));
