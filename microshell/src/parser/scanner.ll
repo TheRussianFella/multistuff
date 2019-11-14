@@ -26,15 +26,11 @@
 %option noyywrap nounput noinput batch debug
 
 %{
-  // A number symbol corresponding to the value in S.
-  yy::parser::symbol_type
-  make_NUMBER (const std::string &s, const yy::parser::location_type& loc);
-%}
-
-%{
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  loc.columns (yyleng);
 %}
+
+com_part \"([^\\\"]|\\.)*\"|[=]|[^|<>\"*?= \t\n]+
 
 %%
 %{
@@ -51,38 +47,27 @@
 ">"            return yy::parser::make_WRITETO(loc);
 "<"            return yy::parser::make_WRITEFROM(loc);
 
-[0-9]+         return make_NUMBER (yytext, loc);
-[a-zA-Z0-9]+   return yy::parser::make_TEXT (yytext, loc);
-.          {
-             throw yy::parser::syntax_error
-               (loc, "invalid character: " + std::string(yytext));
+{com_part}     return yy::parser::make_COMMAND_PART (yytext, loc);
+.              {
+                throw yy::parser::syntax_error
+                  (loc, "invalid character: " + std::string(yytext));
 }
 <<EOF>>        return yy::parser::make_END (loc);
 %%
 
-
-yy::parser::symbol_type
-make_NUMBER (const std::string &s, const yy::parser::location_type& loc)
-{
-  return yy::parser::make_NUMBER (std::stoi(s), loc);
-}
 
 
 void
 Driver::scan_begin ()
 {
   yy_flex_debug = trace_scanning;
-  if (file.empty () || file == "-")
-    yyin = stdin;
-  else if (!(yyin = fopen (file.c_str (), "r")))
-    {
-      std::cerr << "cannot open " << file << ": " << strerror(errno) << '\n';
-      exit (EXIT_FAILURE);
-    }
+
+  yy_scan_string(target.c_str());
+
 }
 
 void
 Driver::scan_end ()
 {
-  fclose (yyin);
+  //fclose (yyin);
 }

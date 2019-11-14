@@ -8,8 +8,11 @@
 
 %code requires {
   # include <string>
+  # include <vector>
   # include <iostream>
+  # include "pipepart.hpp"
   class Driver;
+  class PipePart;
 }
 
 // The parsing context.
@@ -22,6 +25,7 @@
 
 %code {
   # include "driver.hh"
+  # include "pipepart.hpp"
 }
 
 %define api.token.prefix {TOK_}
@@ -32,26 +36,28 @@
   WRITEFROM "<"
 ;
 
-%type <std::string> item;
-%type <std::vector<std::string>> list;
-%token <std::string> TEXT;
-%token <int> NUMBER;
+%type  <PipePart> command;
+%type  <std::vector<PipePart>> list;
+%token <std::string> COMMAND_PART;
 
 %%
 %start result;
 
 result:
-  list  { std::cout << $1[0] << " " << $1[1] << '\n'; }
+  list              { drv.result = $1; }
 ;
 
 list:
-  %empty     { /* Generates an empty string list */ }
-| list item  { $$ = $1; $$.push_back ($2); }
+  %empty            { /* Generates an empty string list */ }
+| list "|" command  { $$ = $1; $3.init(); $$.push_back ($3); }
+| list command      { $$ = $1; $2.init(); $$.push_back ($2); }
 ;
 
-item:
-  TEXT    { $$ = std::string($1);  }
-| NUMBER  { $$ = std::to_string ($1 + 2); }
+command:
+  %empty                   {}
+| command ">" COMMAND_PART { $$ = $1; $$.output_file = std::string($3); }
+| command "<" COMMAND_PART { $$ = $1; $$.input_file  = std::string($3); }
+| command COMMAND_PART     { $$ = $1; $$.arguments.push_back(std::string($2)); }
 ;
 %%
 

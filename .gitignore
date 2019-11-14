@@ -1,2 +1,7 @@
 *.o
 shell
+*.a
+pars
+location.hh
+parser.hh
+

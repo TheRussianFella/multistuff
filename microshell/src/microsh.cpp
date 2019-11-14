@@ -1,4 +1,5 @@
 #include "microsh.h"
+#include "parser/driver.hh"
 
 /////////////// DefaultDict
 
@@ -13,7 +14,7 @@ std::string DefaultDict::at(const std::string &key) {
 ////////////////// Shell
 
 // Constructor
-Microsh::Microsh() : reg_parser(), lex_parser() {
+Microsh::Microsh() : driver() {
 
   shell_functions = new std::map<std::string, Microsh::shell_func>;
 
@@ -51,12 +52,10 @@ std::string Microsh::get_line() {
   return line;
 };
 
-std::string Microsh::parse_reg_exp(const std::string &line) {
-  return this->reg_parser.parse(line);
-}
 
 std::vector<PipePart> Microsh::parse_command(const std::string &line) {
-  return this->lex_parser.parse(line);
+  driver.parse(line);
+  return driver.result;
 }
 
 
@@ -88,7 +87,7 @@ int Microsh::pwd(const PipePart& part) {
 
 int Microsh::set(const PipePart& part) {
 
-  
+
   return 0;
 }
 
@@ -137,7 +136,14 @@ int Microsh::exec(const PipePart& part) {
   return execvp(part.command.c_str(), &args_pointers[0]);
 }
 
-int Microsh::exec_pipe(const std::vector<PipePart>& parts, int last_output, size_t idx) {
+int Microsh::exec_pipe(std::vector<PipePart>& parts, int last_output, size_t idx) {
+
+  // Open pipepart's input and output files
+
+  if (parts[idx].output_file != "")
+    parts[idx].output = fileno(fopen(parts[idx].output_file.c_str(), "w+"));
+  if (parts[idx].input_file != "")
+    parts[idx].input  = fileno(fopen(parts[idx].input_file.c_str(),  "r+"));
 
   // Check if pipe has ended and then connect it's parts
 
@@ -200,7 +206,7 @@ int Microsh::run(const std::string& line) {
 
   // Create parts of pipe
 
-  std::vector<PipePart> parts = this->lex_parser.parse(line);
+  std::vector<PipePart> parts = parse_command(line);
 
   // Now pipe itself
 

@@ -11,7 +11,6 @@ int main() {
   while (!code) {
 
     line = micro.get_line();
-    line = micro.parse_reg_exp(line);
     code = micro.run(line);
 
   }

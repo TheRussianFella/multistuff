@@ -8,10 +8,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <regex>
 
-#include "parsers.h"
 #include "parser/driver.hh"
+#include "parser/pipepart.hpp"
 
 ////////////////////////////////////
 // Class for storing variables
@@ -35,9 +34,12 @@ class Microsh {
 
 private:
 
-  RegExpParser reg_parser;
-  LexParser lex_parser;
-  
+  ///////
+  // Parser
+  //////
+
+  Driver driver;
+
   ///////
   // Shell functions
   ///////
@@ -66,7 +68,7 @@ private:
   ///////
 
   std::vector<PipePart> parse_command(const std::string& line);
-  int exec_pipe(const std::vector<PipePart>& parts, int last_output, size_t idx);
+  int exec_pipe(std::vector<PipePart>& parts, int last_output, size_t idx);
   int exec(const PipePart& part);
 
 public:
@@ -75,7 +77,6 @@ public:
   ~Microsh();
 
   std::string get_line();
-  std::string parse_reg_exp(const std::string& line);
   int run(const std::string& line);
 
 };

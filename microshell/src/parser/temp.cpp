@@ -6,14 +6,18 @@ main (int argc, char *argv[])
 {
   int res = 0;
   Driver drv;
-  for (int i = 1; i < argc; ++i)
-    if (argv[i] == std::string ("-p"))
-      drv.trace_parsing = true;
-    else if (argv[i] == std::string ("-s"))
-      drv.trace_scanning = true;
-    else if (!drv.parse (argv[i]))
-      std::cout << drv.result << '\n';
-    else
-      res = 1;
+
+  drv.parse("ls -l > a.txt | grep \"sdfjklj sdfjlk\" | cat < a < b");
+
+  for (auto a: drv.result) {
+    std::cout << "\nCommand: " << a.command << "\n";
+    std::cout << "Args: ";
+    for (auto b: a.arguments)
+      std::cout << b << " ";
+    std::cout << "\nInp: " << a.input_file << "\n";
+    std::cout << "Out: " << a.output_file << "\n";
+
+  }
+
   return res;
 }
