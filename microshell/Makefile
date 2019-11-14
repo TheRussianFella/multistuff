@@ -28,6 +28,7 @@ ${BIN}/scanner.o: ${PARSER_PATH}/scanner.ll ${BIN}/parser.o
 	${CXX} ${CCFLAGS} -c ${PARSER_PATH}/scanner.cc -o ${BIN}/scanner.o
 
 build_lib: ${BIN}/scanner.o ${BIN}/driver.o ${BIN}/parser.o
+	mkdir -p ${BIN}
 	ar rvs ${BIN}/libpars.a ${BIN}/scanner.o ${BIN}/driver.o ${BIN}/parser.o
 	rm ${BIN}/scanner.o ${BIN}/driver.o ${BIN}/parser.o ${PARSER_PATH}/scanner.cc \
 	                     ${PARSER_PATH}/parser.cc
@@ -43,4 +44,5 @@ ${BIN}/microsh.o: ${SRC}/microsh.cpp ${SRC}/microsh.h
 	${CXX} ${CCFLAGS} -c ${SRC}/microsh.cpp -o ${BIN}/microsh.o
 
 build:  ${SRC}/shell.cpp ${BIN}/microsh.o ${BIN}/libpars.a
+	mkdir -p ${BIN}
 	${CXX} ${CCFLAGS} ${SRC}/shell.cpp -o shell ${BIN}/microsh.o -L./bin -lpars
