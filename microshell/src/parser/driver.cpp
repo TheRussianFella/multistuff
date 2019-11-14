@@ -5,8 +5,10 @@
 // Parsing driver
 //////
 
-Driver::Driver ()
-  : trace_parsing (false), trace_scanning (false) {}
+Driver::Driver (DefaultDict* variables)
+  : trace_scanning (false), trace_parsing (false) {
+    this->variables = variables;
+  }
 
 int Driver::parse (const std::string& target) {
 

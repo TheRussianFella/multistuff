@@ -1,11 +1,14 @@
 #include <iostream>
 #include "driver.hh"
+#include "defaultdict.hpp"
 
 int
 main (int argc, char *argv[])
 {
   int res = 0;
-  Driver drv;
+  DefaultDict* vars = new DefaultDict();
+
+  Driver drv(vars);
 
   drv.parse("ls -l > a.txt | grep \"sdfjklj sdfjlk\" | cat < a < b");
 
@@ -19,5 +22,7 @@ main (int argc, char *argv[])
 
   }
 
+  delete vars;
+  
   return res;
 }

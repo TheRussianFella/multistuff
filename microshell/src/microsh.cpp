@@ -1,20 +1,9 @@
 #include "microsh.h"
-#include "parser/driver.hh"
-
-/////////////// DefaultDict
-
-std::string DefaultDict::at(const std::string &key) {
-  if (count(key))
-    return std::map<std::string, std::string>::operator[](key);
-  else
-    return std::string("");
-
-}
 
 ////////////////// Shell
 
 // Constructor
-Microsh::Microsh() : driver() {
+Microsh::Microsh() : driver(&shell_variables), launched_children(0) {
 
   shell_functions = new std::map<std::string, Microsh::shell_func>;
 
@@ -25,13 +14,10 @@ Microsh::Microsh() : driver() {
 
   state_functions = std::vector<std::string>({"cd", "set"});
 
-  shell_variables = new DefaultDict();
-
 };
 
 Microsh::~Microsh() {
   delete shell_functions;
-  delete shell_variables;
 }
 
 // Methods
@@ -87,13 +73,14 @@ int Microsh::pwd(const PipePart& part) {
 
 int Microsh::set(const PipePart& part) {
 
+  shell_variables[part.arguments[1]] = part.arguments[3];
 
   return 0;
 }
 
 int Microsh::echo(const PipePart &part) {
 
-  std::cout << (*shell_variables).at("nigga") << "\n";
+  std::cout << shell_variables.at("nigga") << "\n";
 
   return 0;
 }
@@ -133,21 +120,22 @@ int Microsh::exec(const PipePart& part) {
 
   // Execute
 
+  launched_children += 1;
   return execvp(part.command.c_str(), &args_pointers[0]);
 }
 
 int Microsh::exec_pipe(std::vector<PipePart>& parts, int last_output, size_t idx) {
 
-  // Open pipepart's input and output files
-
-  if (parts[idx].output_file != "")
-    parts[idx].output = fileno(fopen(parts[idx].output_file.c_str(), "w+"));
-  if (parts[idx].input_file != "")
-    parts[idx].input  = fileno(fopen(parts[idx].input_file.c_str(),  "r+"));
-
   // Check if pipe has ended and then connect it's parts
 
   if (idx != parts.size()) {
+
+    // Open pipepart's input and output files
+
+    if (parts[idx].output_file != "")
+      parts[idx].output = fileno(fopen(parts[idx].output_file.c_str(), "w+"));
+    if (parts[idx].input_file != "")
+      parts[idx].input  = fileno(fopen(parts[idx].input_file.c_str(),  "r+"));
 
     ////
     // State functions are run in the parent process
@@ -215,8 +203,10 @@ int Microsh::run(const std::string& line) {
   // Now wait for it all to end
 
   int status;
-  for (size_t i = 0; i < parts.size(); ++i)
+  for (size_t i = 0; i < parts.size(); ++i) {
     wait(&status);
+    launched_children -= 1;
+  }
 
   return code;
 };

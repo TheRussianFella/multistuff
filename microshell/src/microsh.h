@@ -11,20 +11,7 @@
 
 #include "parser/driver.hh"
 #include "parser/pipepart.hpp"
-
-////////////////////////////////////
-// Class for storing variables
-////////////////////////////////////
-
-class DefaultDict : private std::map<std::string, std::string>
-{
-public:
-
-  using std::map<std::string, std::string>::clear;
-  using std::map<std::string, std::string>::operator[];
-
-  std::string at(const std::string &key);
-};
+#include "parser/defaultdict.hpp"
 
 ///////////////////////////////////////
 // Shell class
@@ -61,11 +48,13 @@ private:
   // Variables
   ///////
 
-  DefaultDict* shell_variables;
+  DefaultDict shell_variables;
 
   ///////
   // Execution
   ///////
+
+  size_t launched_children;
 
   std::vector<PipePart> parse_command(const std::string& line);
   int exec_pipe(std::vector<PipePart>& parts, int last_output, size_t idx);

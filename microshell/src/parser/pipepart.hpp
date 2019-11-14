@@ -10,7 +10,8 @@ struct PipePart {
 
 public:
 
-  PipePart() : input(0), output(1), command("") {};
+  PipePart() : input(0), output(1), input_file(""),
+               output_file(""), command(""){};
 
   int input;
   int output;

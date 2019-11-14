@@ -6,6 +6,7 @@
 
 # include "parser.hh"
 # include "pipepart.hpp"
+# include "defaultdict.hpp"
 
 // Give Flex the prototype of yylex we want ...
 # define YY_DECL \
@@ -20,13 +21,17 @@ YY_DECL;
 class Driver
 {
 public:
-  Driver ();
+
+  Driver (DefaultDict* variables);
 
   std::vector<PipePart> result;
 
   // Run parser on certain string
   int parse (const std::string& target);
   std::string target;
+
+  // variables
+  DefaultDict* variables;
 
   // Handling the scanner.
   void scan_begin ();
