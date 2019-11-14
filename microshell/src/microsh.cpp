@@ -1,5 +1,17 @@
 #include "microsh.h"
 
+/////////////// DefaultDict
+
+std::string DefaultDict::at(const std::string &key) {
+  if (count(key))
+    return std::map<std::string, std::string>::operator[](key);
+  else
+    return std::string("");
+
+}
+
+////////////////// Shell
+
 // Constructor
 Microsh::Microsh() : reg_parser(), lex_parser() {
 
@@ -8,13 +20,17 @@ Microsh::Microsh() : reg_parser(), lex_parser() {
   (*shell_functions).insert(std::make_pair(std::string("cd"), &Microsh::cd));
   (*shell_functions).insert(std::make_pair(std::string("pwd"), &Microsh::pwd));
   (*shell_functions).insert(std::make_pair(std::string("set"), &Microsh::set));
+  (*shell_functions).insert(std::make_pair(std::string("echo"), &Microsh::echo));
 
   state_functions = std::vector<std::string>({"cd", "set"});
+
+  shell_variables = new DefaultDict();
 
 };
 
 Microsh::~Microsh() {
   delete shell_functions;
+  delete shell_variables;
 }
 
 // Methods
@@ -71,9 +87,17 @@ int Microsh::pwd(const PipePart& part) {
 }
 
 int Microsh::set(const PipePart& part) {
+
+  
   return 0;
 }
 
+int Microsh::echo(const PipePart &part) {
+
+  std::cout << (*shell_variables).at("nigga") << "\n";
+
+  return 0;
+}
 ///////////////
 // Execution //
 ///////////////
@@ -91,9 +115,8 @@ int Microsh::exec(const PipePart& part) {
   if ( shell_functions -> count(part.command) ) {
 
     shell_func func = (*shell_functions)[part.command];
-    int code = (this->*func)(part);
+    exit((this->*func)(part));
 
-    exit(code);
   }
 
   ////
@@ -128,7 +151,7 @@ int Microsh::exec_pipe(const std::vector<PipePart>& parts, int last_output, size
             != state_functions.end()) {
 
       shell_func func = (*shell_functions)[parts[idx].command];
-      int code = (this->*func)(parts[idx]);
+      (this->*func)(parts[idx]);
 
       return exec_pipe(parts, 0, idx+1);
     }

@@ -8,8 +8,28 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <regex>
 
 #include "parsers.h"
+#include "parser/driver.hh"
+
+////////////////////////////////////
+// Class for storing variables
+////////////////////////////////////
+
+class DefaultDict : private std::map<std::string, std::string>
+{
+public:
+
+  using std::map<std::string, std::string>::clear;
+  using std::map<std::string, std::string>::operator[];
+
+  std::string at(const std::string &key);
+};
+
+///////////////////////////////////////
+// Shell class
+///////////////////////////////////////
 
 class Microsh {
 
@@ -17,7 +37,7 @@ private:
 
   RegExpParser reg_parser;
   LexParser lex_parser;
-
+  
   ///////
   // Shell functions
   ///////
@@ -30,15 +50,16 @@ private:
 
   std::vector<std::string> state_functions;
 
-  int cd (const PipePart& part);
-  int pwd(const PipePart& part);
-  int set(const PipePart& part);
+  int cd  (const PipePart& part);
+  int pwd (const PipePart& part);
+  int set (const PipePart& part);
+  int echo(const PipePart& part);
 
   ///////
   // Variables
   ///////
 
-  std::map<std::string, std::string> shell_variables;
+  DefaultDict* shell_variables;
 
   ///////
   // Execution
