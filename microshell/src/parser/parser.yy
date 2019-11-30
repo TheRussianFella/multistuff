@@ -10,6 +10,7 @@
   # include <string>
   # include <vector>
   # include <iostream>
+  # include <algorithm>
   # include "pipepart.hpp"
   class Driver;
   class PipePart;
@@ -41,6 +42,7 @@
 %token <std::string> COMMAND_PART;
 %token <std::string> VARIABLE;
 %token <std::string> RAW_COMMAND_PART;
+%token <std::string> REGEXP;
 
 %%
 %start result;
@@ -63,6 +65,8 @@ command:
 | command VARIABLE         { $$ = $1; $$.arguments.push_back( drv.insert_variable($2) ); }
 | command RAW_COMMAND_PART { $$ = $1; $$.arguments.push_back
                                 (drv.insert_multi_variables($2.substr(1, $2.size()-2))); }
+| command REGEXP           { $$ = $1; auto a = drv.parse_reg($2);
+                             $$.arguments.insert($$.arguments.end(), a.begin(), a.end()); }
 ;
 %%
 

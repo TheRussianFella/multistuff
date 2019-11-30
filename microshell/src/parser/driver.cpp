@@ -1,6 +1,11 @@
 #include "driver.hh"
 #include "parser.hh"
 
+// For listing directory
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+
 //////
 // Parsing driver
 //////
@@ -27,9 +32,12 @@ std::string Driver::insert_variable(const std::string &line) {
   return variables->at(line.substr(1));
 }
 
-// Yes, I have written one custom parser - because I am too dump to
+// Yes, I have written custom parsers - because I am too dump to
 // realise how to add it into grammar.
 
+////
+// Variables
+////
 std::string Driver::insert_multi_variables(const std::string &line) {
 
   std::string result, var;
@@ -59,4 +67,130 @@ std::string Driver::insert_multi_variables(const std::string &line) {
   result += line.substr(last_el);
 
   return result;
+}
+
+////
+// Now for regular expressions
+////
+
+int getdir (std::string dir, std::vector<std::string> &files)
+{
+    DIR *dp;
+    struct dirent *dirp;
+    if((dp  = opendir(dir.c_str())) == NULL) {
+        std::cout << "Error(" << errno << ") opening " << dir << std::endl;
+        return errno;
+    }
+
+    std::string temp;
+    while ((dirp = readdir(dp)) != NULL) {
+        temp = std::string(dirp->d_name);
+        if (temp != ".." && temp != ".")
+          files.push_back(temp);
+    }
+    closedir(dp);
+    return 0;
+}
+
+bool isdir( const std::string& path ) {
+
+    DIR *pDir;
+    bool bExists = false;
+
+    pDir = opendir (path.c_str());
+
+    if (pDir != NULL)
+    {
+        bExists = true;
+        (void) closedir (pDir);
+    }
+
+    return bExists;
+}
+
+int Driver::parse_part(size_t curr_token, std::string path,
+  std::vector<std::string>& tokens, std::vector<std::string>& answer) {
+
+  assert( curr_token < tokens.size() );
+
+  // Listing our directory
+  std::vector<std::string> dir_files;
+  getdir(path, dir_files);
+
+  //std::for_each(dir_files.begin(), dir_files.end(), [](std::string tok) {std::cout << tok << " ";});
+  // Parsing regular expression token [^|<>\"=$ \t\n]
+
+  std::string final_token = tokens[curr_token];
+
+  std::string::size_type n = 0;
+
+  std::string all_reg("[^|<>\"=$ \t\n]*");
+  std::string one_reg("[^|<>\"=$ \t\n]");
+
+  while ( (n = final_token.find("*", n)) != std::string::npos ) {
+    final_token.replace(n, 1, all_reg);
+    n += all_reg.size();
+  }
+
+  n = 0;
+
+  while ( (n = final_token.find("?", n)) != std::string::npos ) {
+    final_token.replace(n, 1, one_reg);
+    n += one_reg.size();
+  }
+
+  std::regex path_regex(final_token);
+
+  std::vector<std::string> results;
+
+  for (auto file: dir_files) {
+    if (std::regex_match(file, path_regex)){
+      results.push_back( path + file );
+    }
+  }
+
+  // Now there are two ways
+  if ( curr_token == tokens.size() - 1 ) {
+    //exiting recursion
+    answer.insert( answer.end(), results.begin(), results.end() );
+    return 0;
+  }
+
+  //going to the next level of folders
+  for ( auto res: results ) {
+    if ( isdir(res) )
+      parse_part(curr_token + 1, res + '/', tokens, answer);
+  }
+
+  return 0;
+}
+
+std::vector<std::string> Driver::parse_reg(const std::string &line) {
+  std::vector<std::string> tokens;
+  std::vector<std::string> ans;
+
+  // Lexer
+  size_t pos = 0;
+  std::string token;
+  std::string s(line);
+
+  while ((pos = s.find("/")) != std::string::npos) {
+      tokens.push_back( s.substr(0, pos) );
+      s.erase(0, pos + 1);
+  }
+  tokens.push_back(s);
+
+  // Parser
+  size_t curr_token = 0;
+  std::string path("");
+
+  if (tokens[0] == "") {
+    curr_token = 1; path = "/";
+  } else {
+    path = "./";
+  }
+
+  parse_part(curr_token, path, tokens, ans);
+
+  return ans;
 }

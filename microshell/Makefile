@@ -6,7 +6,7 @@
 SRC = src
 BIN = bin
 PARSER_PATH = src/parser
-CCFLAGS = -g -Wall -fsanitize=address
+CCFLAGS = -g -Wall -fsanitize=address -std=c++17 -lstdc++fs
 CXX = g++
 
 #========

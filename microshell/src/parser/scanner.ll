@@ -33,6 +33,7 @@
 com_part [=]|[^|<>\"*?=$ \t\n]+
 com_raw_part  \"([^\\\"]|\\.)*\"
 variable \$[a-zA-Z]+
+regexp [^|<>\"=$ \t\n]*[\*|?]+[^|<>\"=$ \t\n]*
 
 %%
 %{
@@ -52,6 +53,7 @@ variable \$[a-zA-Z]+
 {com_part}     return yy::parser::make_COMMAND_PART (yytext, loc);
 {variable}     return yy::parser::make_VARIABLE     (yytext, loc);
 {com_raw_part} return yy::parser::make_RAW_COMMAND_PART (yytext, loc);
+{regexp}       return yy::parser::make_REGEXP    (yytext, loc);
 
 .              {
                 throw yy::parser::syntax_error

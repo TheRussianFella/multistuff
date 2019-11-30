@@ -3,6 +3,7 @@
 # include <string>
 # include <map>
 # include <vector>
+# include <regex>
 
 # include "parser.hh"
 # include "pipepart.hpp"
@@ -22,7 +23,11 @@ class Driver
 {
 
 private:
+
   DefaultDict* variables;
+
+  int parse_part(size_t curr_token, std::string path,
+    std::vector<std::string>& tokens, std::vector<std::string>& answer);
 
 public:
 
@@ -34,13 +39,21 @@ public:
   int parse (const std::string& target);
   std::string target;
 
-  // variables
+  /////////
+  // Variables parser
+  /////////
   std::string insert_variable(const std::string& line);
   std::string insert_multi_variables(const std::string& line);
+
+  /////////
+  // RegExp Parser
+  /////////
+  std::vector<std::string> parse_reg(const std::string& line);
 
   // Handling the scanner.
   void scan_begin ();
   void scan_end ();
+
   // Whether to generate scanner debug traces.
   bool trace_scanning;
   bool trace_parsing;
