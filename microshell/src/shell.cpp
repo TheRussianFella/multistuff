@@ -2,6 +2,11 @@
 
 #include "microsh.h"
 
+//TODO: > a falls with address sanitizer
+//TODO: regular expressions are not actually regular expressions
+//TODO: global variables
+//TODO: Ctrl-D
+
 int main(int argc, char** argv) {
 
   Microsh micro;
@@ -27,7 +32,8 @@ int main(int argc, char** argv) {
     std::string("cat < Makefile | cat > b"),
     std::string("set MAX=idon'tlikeyou"),
     std::string("echo $MAX")
-  });
+
+});
 
     for (auto t: tests)
       micro.run(t);

@@ -4,4 +4,4 @@ shell
 pars
 location.hh
 parser.hh
-
+*.out
