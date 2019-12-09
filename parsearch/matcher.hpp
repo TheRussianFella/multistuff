@@ -1,13 +1,12 @@
 #include <fstream>
 #include <algorithm>
 
-// TODO: Записывать результаты в очередь
-
 class FileMatcher {
 
 public:
 
-  void operator()(ParallelQueue<std::string>& shared_queue, std::string query, std::shared_future<void> death_signal) {
+  void operator()(ParallelQueue<std::string>& shared_queue, ParallelQueue<std::pair<std::string, int>>& output_queue,
+    std::string query, std::shared_future<void> death_signal) {
 
       while ( death_signal.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout ){
         try {
@@ -17,10 +16,8 @@ public:
           std::string temp; int line_num = 0;
 
           while ( std::getline(is, temp) && ++line_num ) {
-            if ( temp.find(query) != std::string::npos ) {
-              std::cout << "FOUND IT\n";
-              std::cout << file_path << " " << line_num << "\n";
-            }
+            if ( temp.find(query) != std::string::npos )
+              output_queue.push( std::make_pair( file_path, line_num ));
           }
 
         } catch (const std::runtime_error& e){
@@ -31,7 +28,7 @@ public:
         }
       }
 
-      std::cout << "Thread terminated...\n";
+      //std::cout << "Thread terminated...\n";
     }
 
 };

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <iostream>
+#include <atomic>
 
 #ifndef PARALLELQUEUE
 #define PARALLELQUEUE
@@ -17,7 +18,7 @@ private:
   std::mutex queue_mutex;
   std::condition_variable not_empty;
   int MAX_WAIT_TIME;
-  size_t size;
+  std::atomic<size_t> size;
 
 public:
 
@@ -25,6 +26,7 @@ public:
 
   int push(const T& value);
   T pop();
+  size_t get_size();
 
 };
 
@@ -57,6 +59,11 @@ T ParallelQueue<T>::pop() {
   size -= 1;
   return result;
 
+}
+
+template <typename T>
+size_t ParallelQueue<T>::get_size() {
+  return size;
 }
 
 #endif
