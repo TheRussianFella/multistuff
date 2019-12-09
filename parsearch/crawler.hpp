@@ -1,13 +1,16 @@
+#include <experimental/filesystem>
+
+namespace fs = std::experimental::filesystem;
+
+
 class FolderCrawler {
 
 public:
 
-  void operator()(ParallelQueue& shared_queue) {
+  void operator()(ParallelQueue<std::string>& shared_queue, std::string base_dir) {
 
-    for (int i = 0; i < 20; ++i) {
-      shared_queue.push( std::string("my string ") + std::to_string(i) );
-      std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    }
+    for (auto& p : fs::recursive_directory_iterator(base_dir) )
+      shared_queue.push( p.path() );
   }
 
 };

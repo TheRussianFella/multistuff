@@ -1,6 +1,8 @@
 #include "parallel_queue.h"
 
-int ParallelQueue::push(const std::string& value) {
+template <typename T>
+inline
+int ParallelQueue<T>::push(const T& value) {
 
   std::lock_guard<std::mutex> lck( queue_mutex );
   queue.push( std::move(value) );
@@ -10,7 +12,9 @@ int ParallelQueue::push(const std::string& value) {
   return 0;
 }
 
-std::string ParallelQueue::pop() {
+template <typename T>
+inline
+T ParallelQueue<T>::pop() {
 
   // If queue is empty we just wait for someone to add items into it.
   std::unique_lock<std::mutex> lck( queue_mutex );
@@ -21,7 +25,7 @@ std::string ParallelQueue::pop() {
     throw std::runtime_error("timeout");
   }
 
-  std::string result(queue.front());
+  T result(queue.front());
   queue.pop();
   size -= 1;
   return result;

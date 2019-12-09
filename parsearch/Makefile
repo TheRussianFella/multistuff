@@ -4,7 +4,7 @@
 # Constants
 #========
 BIN = bin
-CCFLAGS = -g -Wall -fsanitize=address -std=c++17 -pthread
+CXXFLAGS = -g -Wall -fsanitize=address -std=c++17 -pthread
 CXX = g++
 
 #========
@@ -13,7 +13,7 @@ CXX = g++
 
 ${BIN}/parallel_queue.o: parallel_queue.cpp parallel_queue.h
 	mkdir -p ${BIN}
-	${CXX} ${CCFLAGS} -c parallel_queue.cpp -o ${BIN}/parallel_queue.o
+	${CXX} ${CXXFLAGS} -c parallel_queue.cpp -o ${BIN}/parallel_queue.o
 
-build:  parsearch.cpp ${BIN}/parallel_queue.o
-	${CXX} ${CCFLAGS} parsearch.cpp -o search ${BIN}/parallel_queue.o
+build: parsearch.cpp crawler.hpp matcher.hpp
+	${CXX} ${CXXFLAGS} parsearch.cpp -o search -lstdc++fs
