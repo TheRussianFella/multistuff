@@ -17,7 +17,6 @@ public:
 
       for (auto& p : fs::directory_iterator(temp, fs::directory_options::skip_permission_denied) ) {
 
-        //std::cout << p.path() << "shit" << "\n";
         if ( fs::is_directory(p.path()) )
           next_directories.push_back(p.path());
         else
