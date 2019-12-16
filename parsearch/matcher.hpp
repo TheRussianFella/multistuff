@@ -66,7 +66,7 @@ public:
   }
 
   void operator()(ParallelQueue<std::string>& shared_queue, ParallelQueue<std::pair<std::string, int>>& output_queue,
-    std::string query, std::shared_future<void> death_signal) {
+    std::shared_future<void> death_signal) {
 
       while ( death_signal.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout ){
         try {

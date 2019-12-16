@@ -7,7 +7,7 @@ class FolderCrawler {
 
 public:
 
-  void operator()(ParallelQueue<std::string>& shared_queue, std::string base_dir) {
+  void operator()(ParallelQueue<std::string>& shared_queue, std::string base_dir, bool recursive) {
 
     std::vector<std::string> next_directories; next_directories.push_back(base_dir);
 
@@ -23,6 +23,9 @@ public:
           shared_queue.push(p.path());
 
       }
+
+      if (!recursive)
+        break;
     }
   }
 
